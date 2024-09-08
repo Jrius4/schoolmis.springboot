@@ -1,0 +1,35 @@
+services:
+  springboot-backend:
+    build: ./../backend
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - postgres-db
+
+  postgres-db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: microservice_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  react-client:
+    build:
+      context: ./../frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    environment:
+      NODE_ENV: production
+    # networks:
+    #   - app-network
+
+networks:
+  app-network:
+    driver: bridge
