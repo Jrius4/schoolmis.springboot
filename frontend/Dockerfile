@@ -1,13 +1,20 @@
-# build environment
-FROM node:13.12.0-alpine as build
+# Use the official Node.js image as the base image
+FROM node:18-alpine as build
+# Set the working directory inside the container
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
+RUN npx ngcc --properties es2023 browser module --first-only --create-ivy-entry-points
+# Copy the rest of the application code into the working directory
 COPY . .
-RUN npm run install
+# Build the Angular app for production
 RUN npm run build
-
-# production environment
+# Use an official NGINX image to serve the Angular app
 FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY default.conf /etc/nginx/conf.d/
+# Copy the build output to the NGINX web server directory
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
+# Expose port 80
 EXPOSE 80
+# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]

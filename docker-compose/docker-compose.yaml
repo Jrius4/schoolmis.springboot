@@ -19,16 +19,16 @@ services:
     networks:
       - app-network
 
-  react-client:
-    build:
-      context: ./../frontend
-      dockerfile: Dockerfile
+  angularfrontend:
+    container_name: angularfrontendcontainer
+    image: angularfrontend:latest
+    build: ./../frontend
     ports:
       - 80:80
-    environment:
-      NODE_ENV: production
-    # networks:
-    #   - app-network
+    expose:
+      - 80
+    networks:
+      - app-network
 
 networks:
   app-network:
